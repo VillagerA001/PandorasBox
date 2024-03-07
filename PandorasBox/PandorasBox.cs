@@ -4,6 +4,7 @@ using Dalamud.Plugin;
 using ECommons;
 using ECommons.Automation;
 using ECommons.DalamudServices;
+using ImGuiNET;
 using PandorasBox.Features;
 using PandorasBox.FeaturesSetup;
 using PandorasBox.IPC;
@@ -38,60 +39,96 @@ public class PandorasBox : IDalamudPlugin
         Initialize();
     }
 
+    private bool isDev = false;
     private void Initialize()
     {
         ECommonsMain.Init(pi, P, ECommons.Module.DalamudReflector);
-        PunishLibMain.Init(pi, "Pandora's Box", new AboutPlugin() { Sponsor = "https://ko-fi.com/taurenkey" });
+        PunishLibMain.Init(pi, "Pandora's Box", new AboutPlugin() { Sponsor = "https://ko-fi.com/taurenkey", Translator = "NiGuangOwO" });
 
-        Ws = new();
-        MainWindow = new();
-        Ws.AddWindow(MainWindow);
-        TaskManager = new();
-        Config = pi.GetPluginConfig() as Configuration ?? new Configuration();
-        Config.Initialize(Svc.PluginInterface);
-
-        Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
+#if RELEASE
+        if (Svc.PluginInterface.IsDev || !Svc.PluginInterface.SourceRepository.Contains("NiGuangOwO/DalamudPlugins/main/pluginmaster.json"))
         {
-            HelpMessage = "Opens the Pandora menu.",
-            ShowInHelp = true
-        });
+            isDev = true;
+            Svc.Framework.Update += Dev;
+        }
+        else
+#endif
+        {
+            isDev = false;
+            Ws = new();
+            MainWindow = new();
+            Ws.AddWindow(MainWindow);
+            TaskManager = new();
+            Config = pi.GetPluginConfig() as Configuration ?? new Configuration();
+            Config.Initialize(Svc.PluginInterface);
 
-        Svc.PluginInterface.UiBuilder.Draw += Ws.Draw;
-        Svc.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-        Common.Setup();
-        PandoraIPC.Init();
-        Events.Init();
-        AFKTimer.Init();
-        provider = new FeatureProvider(Assembly.GetExecutingAssembly());
-        provider.LoadFeatures();
-        FeatureProviders.Add(provider);
+            Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
+            {
+                HelpMessage = "打开PandorasBox菜单.",
+                ShowInHelp = true
+            });
 
+            Svc.PluginInterface.UiBuilder.Draw += Ws.Draw;
+            Svc.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            Svc.PluginInterface.UiBuilder.Draw += DrawDevMenu;
+            Common.Setup();
+            PandoraIPC.Init();
+            Events.Init();
+            AFKTimer.Init();
+            provider = new FeatureProvider(Assembly.GetExecutingAssembly());
+            provider.LoadFeatures();
+            FeatureProviders.Add(provider);
+        }
     }
 
+    private bool showWarning = false;
+    private void Dev(IFramework framework)
+    {
+        if (Svc.ClientState.IsLoggedIn && !showWarning)
+        {
+            showWarning = true;
+            if (Svc.PluginInterface.IsDev)
+            {
+                Svc.Chat.PrintError("[Pandora's Box] 禁止通过本地加载本插件！");
+            }
+            if (!Svc.PluginInterface.SourceRepository.Contains("NiGuangOwO/DalamudPlugins/main/pluginmaster.json"))
+            {
+                Svc.Chat.PrintError($"[Pandora's Box] 当前安装来源 {Svc.PluginInterface.SourceRepository} 非本维护者仓库！");
+            }
+        }
+    }
 
     public void Dispose()
     {
-        Svc.Commands.RemoveHandler(CommandName);
-        foreach (var f in Features.Where(x => x is not null && x.Enabled))
+        if (isDev)
         {
-            f.Disable();
-            f.Dispose();
+            Svc.Framework.Update -= Dev;
         }
+        else
+        {
+            Svc.Commands.RemoveHandler(CommandName);
+            foreach (var f in Features.Where(x => x is not null && x.Enabled))
+            {
+                f.Disable();
+                f.Dispose();
+            }
 
-        provider.UnloadFeatures();
+            provider.UnloadFeatures();
 
-        Svc.PluginInterface.UiBuilder.Draw -= Ws.Draw;
-        Svc.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
-        Ws.RemoveAllWindows();
-        MainWindow = null;
-        Ws = null;
-        ECommonsMain.Dispose();
-        PunishLibMain.Dispose();
-        FeatureProviders.Clear();
-        Common.Shutdown();
-        PandoraIPC.Dispose();
-        Events.Disable();
-        AFKTimer.Dispose();
+            Svc.PluginInterface.UiBuilder.Draw -= Ws.Draw;
+            Svc.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
+            Svc.PluginInterface.UiBuilder.Draw -= DrawDevMenu;
+            Ws.RemoveAllWindows();
+            MainWindow = null;
+            Ws = null;
+            ECommonsMain.Dispose();
+            PunishLibMain.Dispose();
+            FeatureProviders.Clear();
+            Common.Shutdown();
+            PandoraIPC.Dispose();
+            Events.Disable();
+            AFKTimer.Dispose();
+        }
         P = null;
     }
 
@@ -103,6 +140,22 @@ public class PandorasBox : IDalamudPlugin
     public void DrawConfigUI()
     {
         MainWindow.IsOpen = !MainWindow.IsOpen;
+    }
+
+    public void DrawDevMenu()
+    {
+        if (Svc.PluginInterface.IsDevMenuOpen && !isDev)
+        {
+            if (ImGui.BeginMainMenuBar())
+            {
+                if (ImGui.BeginMenu("PandorasBox"))
+                {
+                    MainWindow.Toggle();
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMainMenuBar();
+            }
+        }
     }
 }
 

@@ -9,25 +9,25 @@ namespace PandorasBox.Features.Actions
 {
     public unsafe class AutoDraw : Feature
     {
-        public override string Name => "Auto-Draw Card";
+        public override string Name => "自动抽卡";
 
-        public override string Description => "Draws an AST card upon job switching or entering a duty.";
+        public override string Description => "在切换占星后或进入副本后自动抽一张卡。";
 
         public class Configs : FeatureConfig
         {
-            [FeatureConfigOption("Set delay (seconds)", FloatMin = 0.1f, FloatMax = 10f, EditorSize = 300)]
+            [FeatureConfigOption("设置延迟 (秒)", FloatMin = 0.1f, FloatMax = 10f, EditorSize = 300)]
             public float ThrottleF = 0.1f;
 
-            [FeatureConfigOption("Trigger at Duty Start")]
+            [FeatureConfigOption("副本开始时触发")]
             public bool DutyStart = false;
 
-            [FeatureConfigOption("Trigger on Respawn")]
+            [FeatureConfigOption("复活时触发")]
             public bool OnRespawn = false;
 
-            [FeatureConfigOption("Trigger on Job Change")]
+            [FeatureConfigOption("切换职业后触发")]
             public bool OnJobChange = true;
 
-            [FeatureConfigOption("Trigger out of combat")]
+            [FeatureConfigOption("离开战斗时触发")]
             public bool OutOfCombat = false;
         }
 

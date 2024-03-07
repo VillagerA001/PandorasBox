@@ -27,9 +27,9 @@ namespace PandorasBox.Features.UI
 {
     public unsafe class WorkshopTurnin : Feature
     {
-        public override string Name => "FC Workshop Hand-In";
+        public override string Name => "部队工房提交";
 
-        public override string Description => "Adds buttons to auto hand-in the current phase and the entire project to the workshop menu.";
+        public override string Description => "将当前阶段和整个项目中用于自动提交的按钮添加到工房菜单中。";
 
         public override FeatureType FeatureType => FeatureType.UI;
 
@@ -43,18 +43,18 @@ namespace PandorasBox.Features.UI
         internal bool needToDisableTurnIns = false;
         internal bool needToDisableConfig = false;
         private static readonly string[] SkipCutsceneStr = { "Skip cutscene?", "要跳过这段过场动画吗？", "要跳過這段過場動畫嗎？", "Videosequenz überspringen?", "Passer la scène cinématique ?", "このカットシーンをスキップしますか？" };
-        private static readonly string[] ContributeMaterialsStr = { "Contribute materials.", "Materialien abliefern", "Fournir des matériaux", "素材を納品する" }; // 2
-        private static readonly string[] AdvancePhaseStr = { "Advance to the next phase of production.", "Arbeitsschritt ausführen", "Faire progresser un projet de con", "作業工程を進捗させる" }; // 5
-        private static readonly string[] CompleteConstructionStr = { "Complete the construction", "Herstellung", "Terminer la con", "を完成させる" }; // 6
-        private static readonly string[] CollectProductStr = { "Collect finished product.", "Produkt entgegennehmen", "Récupérer un projet terminé", "アイテムを受け取る" }; // 4
-        private static readonly string[] LeaveWorkshopStr = { "Nothing.", "Nichts", "Annuler", "やめる" }; // 7
-        private static readonly string[] ConfirmContributionStr = { "to the company project?", "schaftsprojekt bereitstellen?", "pour le projet de con", "カンパニー製作設備に納品します。" };
-        private static readonly string[] ConfirmProductRetrievalStr = { "Retrieve", "entnehmen", "Récupérer", "を回収します。" };
+        private static readonly string[] ContributeMaterialsStr = { "Contribute materials.", "交纳素材", "Materialien abliefern", "Fournir des matériaux", "素材を納品する" }; // 2
+        private static readonly string[] AdvancePhaseStr = { "Advance to the next phase of production.", "推进工程进展", "Arbeitsschritt ausführen", "Faire progresser un projet de con", "作業工程を進捗させる" }; // 5
+        private static readonly string[] CompleteConstructionStr = { "Complete the construction", "完成", "Herstellung", "Terminer la con", "を完成させる" }; // 6
+        private static readonly string[] CollectProductStr = { "Collect finished product.", "领取道具", "Produkt entgegennehmen", "Récupérer un projet terminé", "アイテムを受け取る" }; // 4
+        private static readonly string[] LeaveWorkshopStr = { "Nothing.", "取消", "Nichts", "Annuler", "やめる" }; // 7
+        private static readonly string[] ConfirmContributionStr = { "to the company project?", "确定要为合建设备提供", "schaftsprojekt bereitstellen?", "pour le projet de con", "カンパニー製作設備に納品します。" };
+        private static readonly string[] ConfirmProductRetrievalStr = { "Retrieve", "回收", "entnehmen", "Récupérer", "を回収します。" };
 
         public Configs Config { get; private set; }
         public class Configs : FeatureConfig
         {
-            [FeatureConfigOption("Times to loop", "", 1, IntMin = 0, IntMax = 100, EditorSize = 300)]
+            [FeatureConfigOption("循环次数", "", 1, IntMin = 0, IntMax = 100, EditorSize = 300)]
             public int partsToBuild = 1;
         }
 
@@ -109,7 +109,7 @@ namespace PandorasBox.Features.UI
 
                 if (active && !phaseActive) ImGui.BeginDisabled();
 
-                if (ImGui.Button(!phaseActive ? $"Phase Turn In###StartPhaseLooping" : $"Turning in... Click to Abort###AbortPhaseLoop"))
+                if (ImGui.Button(!phaseActive ? $"阶段提交###StartPhaseLooping" : $"提交中... 点击取消###AbortPhaseLoop"))
                 {
                     if (!phaseActive)
                     {
@@ -118,7 +118,7 @@ namespace PandorasBox.Features.UI
                     }
                     else
                     {
-                        EndLoop("User cancelled");
+                        EndLoop("用户取消");
                     }
                 }
 
@@ -128,7 +128,7 @@ namespace PandorasBox.Features.UI
 
                 if (active && !projectActive) ImGui.BeginDisabled();
 
-                if (ImGui.Button(!projectActive ? $"Project Turn In###StartProjectLooping" : $"Turning in... Click to Abort###AbortProjectLoop"))
+                if (ImGui.Button(!projectActive ? $"项目提交###StartProjectLooping" : $"提交中... 点击取消###AbortProjectLoop"))
                 {
                     if (!projectActive)
                     {
@@ -137,7 +137,7 @@ namespace PandorasBox.Features.UI
                     }
                     else
                     {
-                        EndLoop("User cancelled");
+                        EndLoop("用户取消");
                     }
                 }
 
@@ -165,7 +165,7 @@ namespace PandorasBox.Features.UI
 
         private bool EndLoop(string msg)
         {
-            Svc.Log.Debug($"Cancelling... Reason: {msg}");
+            Svc.Log.Debug($"取消中... 原因： {msg}");
             active = false;
             phaseActive = false;
             projectActive = false;
@@ -207,9 +207,9 @@ namespace PandorasBox.Features.UI
                 var requiredIngredients = GetRequiredItems();
                 if (requiredIngredients?.Count == 0) { Svc.Log.Debug("req is 0"); return true; }
 
-                if (MustEndLoop(!IsSufficientlyLeveled(requiredIngredients), "Not high enough level to turn-in items") ||
-                    MustEndLoop(Svc.ClientState.LocalPlayer.ClassJob.Id is < 8 or > 15, "Must be a DoH to turn-in items.") ||
-                    MustEndLoop(requiredIngredients.All(x => x.AmountInInventory < x.AmountPerTurnIn), "No items to turn-in."))
+                if (MustEndLoop(!IsSufficientlyLeveled(requiredIngredients), "等级不足，无法提交道具。") ||
+                    MustEndLoop(Svc.ClientState.LocalPlayer.ClassJob.Id is < 8 or > 15, "必须切换至能工巧匠才能提交道具。") ||
+                    MustEndLoop(requiredIngredients.All(x => x.AmountInInventory < x.AmountPerTurnIn), "没有道具可以提交。"))
                 {
                     YesAlready.Unlock();
 
@@ -283,11 +283,11 @@ namespace PandorasBox.Features.UI
             }
             else
             {
-                EndLoop("Failed to find SubmarinePartsMenu");
+                EndLoop("无法找到SubmarinePartsMenu");
                 return true;
             }
 
-            if (projectActive) TaskManager.Enqueue(() => EndLoop($"Finished {nameof(TurnInProject)}"));
+            if (projectActive) TaskManager.Enqueue(() => EndLoop($"完成 {nameof(TurnInProject)}"));
             return true;
         }
 
@@ -303,7 +303,7 @@ namespace PandorasBox.Features.UI
             // 144-156 level requirement to turn in part (uint)
             if (!TryGetAddonByName<AtkUnitBase>("SubmarinePartsMenu", out var addon))
             {
-                EndLoop("Failed to find SubmarinePartsMenu");
+                EndLoop("无法找到SubmarinePartsMenu");
                 return null;
             }
 

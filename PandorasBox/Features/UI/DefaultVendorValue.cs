@@ -11,14 +11,14 @@ namespace PandorasBox.Features.UI
 {
     internal class DefaultVendorValue : Feature
     {
-        public override string Name { get; } = "Default Vendor Buy Amount";
-        public override string Description { get; } = "Sets the default amount for items to buy from vendors";
+        public override string Name { get; } = "供应商默认购买数量";
+        public override string Description { get; } = "设置要从供应商处购买的商品的默认数量";
 
         public override FeatureType FeatureType => FeatureType.UI;
 
         public class Config : FeatureConfig
         {
-            [FeatureConfigOption("Default Value", IntMin = 1, IntMax = 99, EditorSize = 300)]
+            [FeatureConfigOption("默认值", IntMin = 1, IntMax = 99, EditorSize = 300)]
             public int Value = 1;
         }
 
@@ -29,8 +29,8 @@ namespace PandorasBox.Features.UI
         public override void Enable()
         {
             Configs = LoadConfig<Config>() ?? new Config();
-            Svc.AddonLifeCycle.RegisterListener(AddonEvent.PostUpdate, ["InclusionShop", "Shop", "ShopExchangeItem", "ShopExchangeCurrency", "GrandCompanyExchange"], CheckNumerics);
-            Svc.AddonLifeCycle.RegisterListener(AddonEvent.PostSetup, ["InclusionShop", "Shop", "ShopExchangeItem", "ShopExchangeCurrency", "GrandCompanyExchange"], CheckThrottle);
+            Svc.AddonLifecycle.RegisterListener(AddonEvent.PostUpdate, ["InclusionShop", "Shop", "ShopExchangeItem", "ShopExchangeCurrency", "GrandCompanyExchange"], CheckNumerics);
+            Svc.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, ["InclusionShop", "Shop", "ShopExchangeItem", "ShopExchangeCurrency", "GrandCompanyExchange"], CheckThrottle);
             base.Enable();
         }
 
@@ -150,8 +150,8 @@ namespace PandorasBox.Features.UI
         public override void Disable()
         {
             SaveConfig(Configs);
-            Svc.AddonLifeCycle.UnregisterListener(CheckNumerics);
-            Svc.AddonLifeCycle.UnregisterListener(CheckThrottle);
+            Svc.AddonLifecycle.UnregisterListener(CheckNumerics);
+            Svc.AddonLifecycle.UnregisterListener(CheckThrottle);
             base.Disable();
         }
 
