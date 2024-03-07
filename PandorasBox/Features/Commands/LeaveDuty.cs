@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace PandorasBox.Features.Commands
 {
-    internal class LeaveDuty : CommandFeature
+    public class LeaveDuty : CommandFeature
     {
         public override string Name => "离开副本";
         public override string Command { get; set; } = "/pdfleave";

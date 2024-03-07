@@ -17,7 +17,7 @@ using ECommons;
 
 namespace PandorasBox.Features.ChatFeature
 {
-    internal class AutoOpenCoords : Feature
+    public class AutoOpenCoords : Feature
     {
         public override string Name => "自动打开地图坐标";
 

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace PandorasBox.Features.UI
 {
-    internal class DefaultVendorValue : Feature
+    public class DefaultVendorValue : Feature
     {
         public override string Name { get; } = "供应商默认购买数量";
         public override string Description { get; } = "设置要从供应商处购买的商品的默认数量";

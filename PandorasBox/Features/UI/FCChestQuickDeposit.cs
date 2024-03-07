@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace PandorasBox.Features.UI
 {
-    internal unsafe class FCChestQuickDeposit : Feature
+    public unsafe class FCChestQuickDeposit : Feature
     {
         internal delegate nint AgentFreeCompanyChest_MoveFCItemDelegate(void* AgentFreeCompanyChest, InventoryType SourceInventory, uint SourceSlot, InventoryType TargetInventory, uint TargetSlot);
         internal Hook<AgentFreeCompanyChest_MoveFCItemDelegate> AgentFreeCompanyChest_MoveFCItem;

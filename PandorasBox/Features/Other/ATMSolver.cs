@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 
 namespace PandorasBox.Features.Other
 {
-    internal class ATMSolver : Feature
+    public class ATMSolver : Feature
     {
         public override string Name { get; } = "自动动态演练 (俗称QTE)";
         public override string Description { get; } = "当动态演练在屏幕上时，自动为您点击按钮或捣碎。";

@@ -12,7 +12,7 @@ using static ECommons.GenericHelpers;
 
 namespace PandorasBox.Features.UI
 {
-    internal class RefreshPF : Feature
+    public class RefreshPF : Feature
     {
         public override string Name { get; } = "Automatically Refresh Party Finder";
         public override string Description { get; } = "Refreshes the Party Finder at set intervals";

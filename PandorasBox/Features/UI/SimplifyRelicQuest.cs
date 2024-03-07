@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace PandorasBox.Features.UI
 {
-    internal class SimplifyRelicQuest : Feature
+    public class SimplifyRelicQuest : Feature
     {
         public override string Name { get; } = "简化遗物任务拾取";
         public override string Description { get; } = "在与 NPC 对话时，添加任务所处阶段的说明。";

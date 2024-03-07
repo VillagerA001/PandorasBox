@@ -8,7 +8,7 @@ using System;
 
 namespace PandorasBox.Features.Other
 {
-    internal class AfkDummyReset : Feature
+    public class AfkDummyReset : Feature
     {
         public override string Name => "挂机时清除木人仇恨";
 

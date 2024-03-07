@@ -15,7 +15,7 @@ using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace PandorasBox.Features.Actions
 {
-    internal unsafe class HotbarMapDecipher : Feature
+    public unsafe class HotbarMapDecipher : Feature
     {
         public override string Name { get; } = "热键栏解读宝物地图";
         public override string Description { get; } = "允许从热键栏中点击宝物地图道具来解读。";

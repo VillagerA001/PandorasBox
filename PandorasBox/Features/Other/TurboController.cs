@@ -10,7 +10,7 @@ using System.Windows.Forms.Design;
 
 namespace PandorasBox.Features.Other
 {
-    internal class TurboController : Feature
+    public class TurboController : Feature
     {
         public override string Name { get; } = "Turbo手柄";
         public override string Description { get; } = "通过按住一个按钮，在手柄上启用快速开火按键。";

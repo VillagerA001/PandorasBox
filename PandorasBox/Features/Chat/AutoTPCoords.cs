@@ -13,7 +13,7 @@ using PandorasBox.IPC;
 
 namespace PandorasBox.Features.ChatFeature
 {
-    internal class AutoTPCoords : Feature
+    public class AutoTPCoords : Feature
     {
         public override string Name => "自动传送到地图坐标";
 

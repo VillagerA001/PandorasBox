@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace PandorasBox.Features.Targets
 {
-    internal class QuestTether : Feature
+    public class QuestTether : Feature
     {
         public override string Name => "Quest Tether (Requires Splatoon)";
 

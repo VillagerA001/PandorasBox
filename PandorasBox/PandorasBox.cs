@@ -121,14 +121,14 @@ public class PandorasBox : IDalamudPlugin
             Ws.RemoveAllWindows();
             MainWindow = null;
             Ws = null;
-            ECommonsMain.Dispose();
-            PunishLibMain.Dispose();
             FeatureProviders.Clear();
             Common.Shutdown();
             PandoraIPC.Dispose();
             Events.Disable();
             AFKTimer.Dispose();
         }
+        ECommonsMain.Dispose();
+        PunishLibMain.Dispose();
         P = null;
     }
 
