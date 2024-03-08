@@ -1,5 +1,4 @@
 using Dalamud.Interface.Internal.Notifications;
-using Dalamud.Plugin.Services;
 using ECommons.Automation;
 using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -73,11 +72,11 @@ namespace PandorasBox.Features.Other
         {
             if ((AtkUnitBase*)Svc.GameGui.GetAddonByName("Dialogue") == null)
                 return;
-            P.TaskManager.Enqueue(CheckTitle, int.MaxValue, "CheckTitle");
-            P.TaskManager.Enqueue(ClickStart, "开始游戏");
-            P.TaskManager.Enqueue(Message, "发送提示");
-            P.TaskManager.Enqueue(SelectCharacter, int.MaxValue, "选择角色");
-            P.TaskManager.Enqueue(SelectYes, "点击确定");
+            P.TaskManager.Enqueue(() => CheckTitle(), int.MaxValue, "CheckTitle");
+            P.TaskManager.Enqueue(() => ClickStart(), "开始游戏");
+            P.TaskManager.Enqueue(() => Message(), "发送提示");
+            P.TaskManager.Enqueue(() => SelectCharacter(), int.MaxValue, "选择角色");
+            P.TaskManager.Enqueue(() => SelectYes(), "点击确定");
         }
 
         private void CheckDialogue(IFramework framework)
@@ -92,20 +91,20 @@ namespace PandorasBox.Features.Other
             }
         }
 
-        public bool? CheckTitle()
+        public bool CheckTitle()
         {
             return (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu") != null
                 && ((AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu"))->IsVisible;
         }
 
-        public bool? Message()
+        public bool Message()
         {
             logging = true;
             Svc.PluginInterface.UiBuilder.AddNotification("开始自动重登,按Shift中止", "Pandoras", NotificationType.Info);
             return true;
         }
 
-        public bool? ClickStart()
+        public bool ClickStart()
         {
             var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu");
             if (addon == null)
@@ -116,17 +115,17 @@ namespace PandorasBox.Features.Other
             return true;
         }
 
-        public bool? SelectCharacter()
+        public bool SelectCharacter()
         {
             var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_CharaSelectListMenu");
             if (addon == null)
                 return false;
-            Callback.Fire(addon, true, 17, 0, Config.CharacterSlot);
+            Callback.Fire(addon, true, 18, 0, Config.CharacterSlot);
             var nextAddon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno");
             return nextAddon != null;
         }
 
-        public bool? SelectYes()
+        public bool SelectYes()
         {
             var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno");
             if (addon == null)
