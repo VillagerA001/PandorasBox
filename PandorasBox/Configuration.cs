@@ -14,6 +14,8 @@ namespace PandorasBox
 
         public bool DisabledTheme = false;
 
+        public string AvailableVersion = "1.5.4.7";
+
         [NonSerialized]
         private DalamudPluginInterface pluginInterface;
 

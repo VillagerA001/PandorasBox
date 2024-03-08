@@ -10,9 +10,12 @@ using PandorasBox.FeaturesSetup;
 using PandorasBox.IPC;
 using PandorasBox.UI;
 using PunishLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace PandorasBox;
 
@@ -38,15 +41,20 @@ public class PandorasBox : IDalamudPlugin
         pi = pluginInterface;
         Initialize();
     }
-
+    private Version version;
     private bool isDev = false;
     private void Initialize()
     {
         ECommonsMain.Init(pi, P, ECommons.Module.DalamudReflector);
         PunishLibMain.Init(pi, "Pandora's Box", new AboutPlugin() { Sponsor = "https://ko-fi.com/taurenkey", Translator = "NiGuangOwO" });
-
+        Config = pi.GetPluginConfig() as Configuration ?? new Configuration();
+        Config.Initialize(Svc.PluginInterface);
+        version = P.GetType().Assembly.GetName().Version;
+        Task.Run(CheckVersion);
 #if RELEASE
-        if (Svc.PluginInterface.IsDev || !Svc.PluginInterface.SourceRepository.Contains("NiGuangOwO/DalamudPlugins/main/pluginmaster.json"))
+        if (Svc.PluginInterface.IsDev
+            || !Svc.PluginInterface.SourceRepository.Contains("NiGuangOwO/DalamudPlugins/main/pluginmaster.json")
+            || version.CompareTo(new Version(Config.AvailableVersion)) < 0)
         {
             isDev = true;
             Svc.Framework.Update += Dev;
@@ -59,8 +67,6 @@ public class PandorasBox : IDalamudPlugin
             MainWindow = new();
             Ws.AddWindow(MainWindow);
             TaskManager = new();
-            Config = pi.GetPluginConfig() as Configuration ?? new Configuration();
-            Config.Initialize(Svc.PluginInterface);
 
             Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
@@ -94,6 +100,10 @@ public class PandorasBox : IDalamudPlugin
             if (!Svc.PluginInterface.SourceRepository.Contains("NiGuangOwO/DalamudPlugins/main/pluginmaster.json"))
             {
                 Svc.Chat.PrintError($"[Pandora's Box] 当前安装来源 {Svc.PluginInterface.SourceRepository} 非本维护者仓库！");
+            }
+            if (version.CompareTo(new Version(Config.AvailableVersion)) < 0)
+            {
+                Svc.Chat.PrintError($"[Pandora's Box] 当前版本已过期或被维护者远程禁用，请等待更新。");
             }
         }
     }
@@ -155,6 +165,24 @@ public class PandorasBox : IDalamudPlugin
                 }
                 ImGui.EndMainMenuBar();
             }
+        }
+    }
+
+    private static async Task CheckVersion()
+    {
+        var url = "https://raw.githubusercontent.com/NiGuangOwO/DalamudPlugins/main/plugins/PandorasBox/version.txt";
+        using var httpClient = new HttpClient();
+        try
+        {
+            var response = await httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            Config.AvailableVersion = content;
+            Config.Save();
+        }
+        catch (HttpRequestException ex)
+        {
+            ex.Log();
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Authors>Puni.sh</Authors>
-    <Version>1.5.4.4</Version>
+    <Version>1.5.4.9</Version>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>

@@ -15,7 +15,7 @@ namespace PandorasBox.Features.UI
         public override string Name { get; } = "简化遗物任务拾取";
         public override string Description { get; } = "在与 NPC 对话时，添加任务所处阶段的说明。";
 
-        public override FeatureType FeatureType => FeatureType.UI;
+        public override FeatureType FeatureType => FeatureType.Disabled;
 
         public override void Enable()
         {
