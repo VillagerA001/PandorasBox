@@ -35,7 +35,7 @@ namespace PandorasBox.Features.UI
             if (direction == Dalamud.Game.Network.NetworkMessageDirection.ZoneDown)
             {
                 //PluginLog.Debug($"opCode: {opCode}");
-                if (opCode == 653 && start)
+                if (opCode == 370 && start)
                 {
                     查房();
                 }
