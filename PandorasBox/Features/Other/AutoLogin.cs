@@ -1,5 +1,3 @@
-using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Memory;
 using ECommons.Automation;
@@ -45,24 +43,16 @@ namespace PandorasBox.Features.Other
             if (Svc.KeyState[Dalamud.Game.ClientState.Keys.VirtualKey.SHIFT] && logging)
             {
                 logging = false;
-                P.TaskManager.Abort();
+                TaskManager.Abort();
                 Svc.PluginInterface.UiBuilder.AddNotification("自动登录已取消", "Pandoras", NotificationType.Warning);
                 return;
             }
         }
 
-        private void OnTitleMenu(AddonEvent type, AddonArgs args)
+        public bool CheckTitle()
         {
-            if (Config.DataCenter == 0 || Config.World == 0)
-                return;
-            if (!logging)
-                return;
-            P.TaskManager.Enqueue(() => ClickStart(), true, "ClickStart");
-            P.TaskManager.Enqueue(() => Message(), true, "Message");
-            P.TaskManager.Enqueue(() => SelectWorld(), true, "SelectWorld");
-            P.TaskManager.DelayNext(500);
-            P.TaskManager.Enqueue(() => SelectCharacter(), true, "SelectCharacter");
-            P.TaskManager.Enqueue(() => SelectYes(), true, "SelectYes");
+            var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("_TitleMenu");
+            return addon != null && addon->IsVisible;
         }
 
         public static bool Message()
@@ -127,7 +117,6 @@ namespace PandorasBox.Features.Other
             if (addon == null)
                 return false;
             Callback.Fire(addon, true, 0);
-            addon->Close(true);
             return true;
         }
 
@@ -181,9 +170,16 @@ namespace PandorasBox.Features.Other
         public override void Enable()
         {
             Config = LoadConfig<Configs>() ?? new Configs();
-            Svc.Framework.Update += CheckLogin;
-            Svc.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "_TitleMenu", OnTitleMenu);
+
+            TaskManager.Enqueue(() => CheckTitle(), int.MaxValue, "CheckTitle");
+            TaskManager.Enqueue(() => ClickStart(), true, "ClickStart");
+            TaskManager.Enqueue(() => Message(), true, "Message");
+            TaskManager.Enqueue(() => SelectWorld(), true, "SelectWorld");
+            TaskManager.DelayNext(500);
+            TaskManager.Enqueue(() => SelectCharacter(), true, "SelectCharacter");
+            TaskManager.Enqueue(() => SelectYes(), true, "SelectYes");
             logging = true;
+
             base.Enable();
         }
 
@@ -191,7 +187,6 @@ namespace PandorasBox.Features.Other
         {
             SaveConfig(Config);
             Svc.Framework.Update -= CheckLogin;
-            Svc.AddonLifecycle.UnregisterListener(OnTitleMenu);
             logging = false;
             base.Disable();
         }

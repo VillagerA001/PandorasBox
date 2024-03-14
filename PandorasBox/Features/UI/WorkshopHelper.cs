@@ -177,7 +177,7 @@ namespace PandorasBox.Features.UI
             }
 
             ImGuiComponents.HelpMarker("如果剪贴板中商品的生产累计小时数小于24小时，将安排生产计划至所有工房。\n" +
-                "如果生产累计小时大于24小时，则将生产计划的前24小时应用于工房1-2号，其余应用于工房3号。");
+                "如果生产累计小时大于24小时，则将生产计划的前24小时应用于工房1-3号，其余应用于工房4号。");
 
             if (ImGui.RadioButton($"手动选择工房", !autoWorkshopSelect))
             {
